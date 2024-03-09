@@ -18,6 +18,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+// 以下兩個還不理解
 app.UseAuthorization();
 
 app.MapControllers();
