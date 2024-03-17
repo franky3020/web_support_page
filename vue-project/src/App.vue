@@ -2,23 +2,40 @@
   <div class="common-layout">
     <el-container>
       <el-header class="flex justify-center items-center">
-        <div class="flex justify-center ">
-          <h1 class="text-2xl ">Support Page</h1>
+        <div class="flex justify-center">
+          <h1 class="text-2xl">Support Page</h1>
         </div>
       </el-header>
       <el-main>
         <div class="flex justify-center">
-          <el-form class="w-9/12" :model="form" label-width="auto" style="max-width: 800px">
+          <el-form
+            v-if="!hasSubmit"
+            class="w-9/12"
+            :model="form"
+            label-width="auto"
+            style="max-width: 800px"
+          >
             <el-form-item class="my-4" label="Your Eamil">
               <el-input v-model="form.email" />
             </el-form-item>
             <el-form-item class="my-7" label="Message">
-              <el-input v-model="form.desc" type="textarea" :rows="5"/>
+              <el-input v-model="form.message" type="textarea" :rows="5" />
             </el-form-item>
             <div class="flex justify-center my-20">
-              <el-button type="primary" @click="onSubmit">Send Message</el-button>
+              <el-button
+                v-loading.fullscreen.lock="fullscreenLoading"
+                type="primary"
+                @click="onSubmit"
+                >Send Message</el-button
+              >
             </div>
           </el-form>
+          <el-result
+            v-if="hasSubmit"
+            icon="success"
+            title="Success send massge"
+            sub-title="I will reply to your email"
+          ></el-result>
         </div>
       </el-main>
     </el-container>
@@ -26,21 +43,23 @@
 </template>
 
 <script lang="ts" setup>
-import { reactive } from 'vue'
+import { reactive, ref } from 'vue'
 
 // do not use same name with ref
 const form = reactive({
   email: '',
-  region: '',
-  date1: '',
-  date2: '',
-  delivery: false,
-  type: [],
-  resource: '',
-  desc: ''
+  message: ''
 })
 
+let hasSubmit = ref(false)
+let fullscreenLoading = ref(false)
+
 const onSubmit = () => {
-  console.log('submit!')
+  console.log('submit!', form.email, form.message)
+  fullscreenLoading.value = true
+  setTimeout(() => {
+    fullscreenLoading.value = false
+    hasSubmit.value = true
+  }, 2000)
 }
 </script>
