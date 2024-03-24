@@ -44,6 +44,7 @@
 
 <script lang="ts" setup>
 import { reactive, ref } from 'vue'
+import axios from 'axios'
 
 // do not use same name with ref
 const form = reactive({
@@ -57,9 +58,15 @@ let fullscreenLoading = ref(false)
 const onSubmit = () => {
   console.log('submit!', form.email, form.message)
   fullscreenLoading.value = true
-  setTimeout(() => {
-    fullscreenLoading.value = false
-    hasSubmit.value = true
-  }, 2000)
+
+  axios
+    .post('hhttps://frankyya.com/support_page_api/WeatherForecast/supportMessage', {
+      Email: form.email,
+      Message: form.message
+    })
+    .then(() => {
+      fullscreenLoading.value = false
+      hasSubmit.value = true
+    })
 }
 </script>
