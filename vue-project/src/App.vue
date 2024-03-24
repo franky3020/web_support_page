@@ -60,7 +60,7 @@ const onSubmit = () => {
   fullscreenLoading.value = true
 
   axios
-    .post('hhttps://frankyya.com/support_page_api/WeatherForecast/supportMessage', {
+    .post('https://frankyya.com/support_page_api/WeatherForecast/supportMessage', {
       Email: form.email,
       Message: form.message
     })
