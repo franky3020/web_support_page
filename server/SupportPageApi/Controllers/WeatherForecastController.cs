@@ -1,6 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
+using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Driver;
+using SupportPageApi.Models;
 
 namespace SupportPageApi.Controllers;
 
@@ -15,16 +18,21 @@ public class WeatherForecastController : ControllerBase
 
     private readonly ILogger<WeatherForecastController> _logger;
 
-    public WeatherForecastController(ILogger<WeatherForecastController> logger)
+    private readonly IMongoCollection<SupportMessageEntity> _supportMessageEntity;
+
+
+    public WeatherForecastController(ILogger<WeatherForecastController> logger, IOptions<WebSupportDatebaseSettings> webSupportDatebaseSettings)
     {
         _logger = logger;
+
+        MongoClient client = new MongoClient(webSupportDatebaseSettings.Value.ConnectionString);
+        _supportMessageEntity = client.GetDatabase(webSupportDatebaseSettings.Value.DatabaseName).GetCollection<SupportMessageEntity>(webSupportDatebaseSettings.Value.CollectionName);
     }
 
     [HttpGet(Name = "GetWeatherForecast")]
     public IEnumerable<WeatherForecast> Get()
     {
-        
-        
+
         return Enumerable.Range(1, 5).Select(index => new WeatherForecast
         {
             Date = DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
@@ -32,27 +40,40 @@ public class WeatherForecastController : ControllerBase
             Summary = Summaries[Random.Shared.Next(Summaries.Length)]
         })
         .ToArray();
+	}
+
+    [HttpPost("supportMessage")]
+    public async Task<IActionResult> PostSupportMessage(SupportMessagePostParam supportMessagePostParam)
+    {
+        var one = new SupportMessageEntity();
+        one.Email = supportMessagePostParam.Email;
+        one.Message = supportMessagePostParam.Message;
+        _supportMessageEntity.InsertOne(one);
+        return Ok();
     }
 
-    [HttpGet("db")]
-    public string GetDb()
+    public class SupportMessagePostParam
     {
-        MongoClient client = new MongoClient("mongodb://root:example@127.0.0.1:27017");
-        var test = client.GetDatabase("franky").GetCollection<SampleClassEntity>("test");
-        var one = new SampleClassEntity();
-        one.message = "franky-2";
-        test.InsertOne(one);
-        //var sampleClassEntityList = test.Find(_ => true).ToList();
-        return "good";
+        public string Email { get; set;} = "";
+        public string Message { get; set;} = "";
     }
 
     [BsonIgnoreExtraElements]
-    public class SampleClassEntity
+    public class SupportMessageEntity
     {
         [BsonId]
-        public string Id { get; set;}
-        public string message { get; set;}
+        [BsonRepresentation(BsonType.ObjectId)]
+        public ObjectId Id { get; set;}
+
+        [BsonElement("Email")]
+        public string Email { get; set;} = "";
+
+        [BsonElement("Message")]
+        public string Message { get; set;} = "";
+
+        public SupportMessageEntity()
+        {
+            Id = ObjectId.GenerateNewId();
+        }
     }
-
-
 }
