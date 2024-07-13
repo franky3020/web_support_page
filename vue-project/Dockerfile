@@ -22,4 +22,5 @@ EXPOSE 8080
 CMD [ "http-server", "dist" ]
 
 # docker build -t support_page_fn -f Dockerfile .
+# sudo docker rm -f support_page_fn
 # docker run -d --name support_page_fn -p 50101:8080 support_page_fn

@@ -14,5 +14,7 @@ WORKDIR /App
 COPY --from=build-env /App/out .
 ENTRYPOINT ["dotnet", "SupportPageApi.dll"]
 
-# docker build -t support_api -f Dockerfile .
-# docker run -d --name franky_test_3 -p 5001:8080 support_api
+# 先修改 appsettings.json 的DB連線字串
+# sudo docker build -t support_api -f Dockerfile .
+# sudo docker rm -f support_api
+# sudo docker run -d --name support_api -p 50100:8080 support_api
